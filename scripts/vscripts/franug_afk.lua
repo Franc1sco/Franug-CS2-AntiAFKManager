@@ -1,5 +1,5 @@
 -- Change the time in seconds on the next line
-AFK_Seconds = 40 
+AFK_Seconds = 40
 
 
 
@@ -11,17 +11,11 @@ function OnRoundStartAFK(event)
 
     Timers:RemoveTimer("AFK_Timer")
 
-    for i = 1, 64 do
-        local hController = EntIndexToHScript(i)
-        if hController ~= nil and hController:GetPawn() ~= nil then
-            local v = hController:GetPawn()
-            if v:IsAlive() then
-                --ScriptPrintMessageChatAll("anterior vivo")
-                afkPos[v] = v:GetAbsOrigin()
-                --ScriptPrintMessageChatAll("anterior vivo despues")
-            else
-                afkPos[v] = nil
-            end
+    for k, player in pairs(Entities:FindAllByClassname("player")) do
+        if player:IsAlive() then
+            afkPos[player] = player:GetAbsOrigin()
+        else
+            afkPos[player] = nil
         end
     end
 
@@ -30,7 +24,6 @@ end
 
 function Check_AFK()
     local AFK_Countdown = AFK_Seconds
-    --ScriptPrintMessageChatAll("primero")
     if not Timers:TimerExists(AFK_Timer) then
         Timers:CreateTimer("AFK_Timer", {
             callback = function()
@@ -46,19 +39,10 @@ function Check_AFK()
 end
 
 function Move_AFK() 
-    --ScriptPrintMessageChatAll("segundo")
-    for i = 1, 64 do
-        local hController = EntIndexToHScript(i)
-
-        if hController ~= nil and hController:GetPawn() ~= nil then
-            local v = hController:GetPawn()
-            if v:IsAlive() then
-                --ScriptPrintMessageChatAll("esta vivo")
-                --ScriptPrintMessageChatAll("vivo con "..v:GetAbsOrigin())
-                if afkPos[v] ~= nil and CompareVectors(afkPos[v], v:GetAbsOrigin()) then
-                    --ScriptPrintMessageChatAll("cogido")
-                    v:SetTeam(1)
-                end
+    for k, player in pairs(Entities:FindAllByClassname("player")) do
+        if player:IsAlive() then
+            if afkPos[player] ~= nil and CompareVectors(afkPos[player], player:GetAbsOrigin()) then
+                player:SetTeam(1)
             end
         end
     end
